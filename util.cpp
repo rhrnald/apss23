@@ -1,7 +1,7 @@
 #include "util.h"
 
 #include <vector>
-#include <string>
+#include <cstring>
 #include <cstdlib>
 #include <map>
 #include <unistd.h>
@@ -11,12 +11,18 @@ using namespace std;
 extern int mpi_rank, mpi_size;  // defined in main.cpp
 extern int N;                   // defined in main.cpp
 extern bool V,S,W;                  // defined in main.cpp
+extern char* input_fname, *output_fname, *answer_fname, *parameter_fname;
+
 void parse_option(int argc, char **argv){
 
   int opt;
-  while((opt = getopt(argc, argv, "n:vswh")) != -1) {
+  while((opt = getopt(argc, argv, "i:o:vv:swh")) != -1) {
     switch (opt) {
-      case 'n': N = atoi(optarg); break;
+      case 'i': strcpy(input_fname, optarg); break;
+      case 'o': strcpy(output_fname, optarg); break;
+      case 'a': strcpy(answer_fname, optarg); break;
+      case 'p': strcpy(parameter_fname, optarg); break;
+
       case 'v': V = true; break;
       case 's': S = true; break;
       case 'w': W = true; break;
@@ -60,10 +66,11 @@ void *read_binary(const char *filename, size_t *size) {
 
 void write_binary(float *output, const char *filename, int size_) {
   fprintf(stderr, " Writing output ... ");
-  fflush(stdout);
   FILE *output_fp = (FILE *)fopen(filename, "w");
-  for (int i = 0; i < size_; i++) {
-    fprintf(output_fp, "%04d", (int)output[i]);
+  
+  char *tmp = (char*)output;
+  for (int i = 0; i < 4*size_; i++) {
+    fprintf(output_fp, "%c", tmp[i]);
   }   
   fclose(output_fp);
   fprintf(stderr, "DONE!\n");
@@ -73,8 +80,7 @@ double get_time() {
   struct timespec tv;
   clock_gettime(CLOCK_MONOTONIC, &tv);
 
-  return 0;
-  //return tv.tv_sec + tv.tv_nsec * 1.0e-9;
+  return tv.tv_sec+tv.tv_nsec*1e-9;
 }
 
 
@@ -82,8 +88,11 @@ void print_help() {
   if (mpi_rank == 0) {
     fprintf(stderr, " Usage: ./translator [-n num_input_sentences] [-vpwh]\n");
     fprintf(stderr, " Options:\n");
-    fprintf(stderr, "  -n : number of input sentences (default: 1)\n");
-    fprintf(stderr, "  -v : validate translator.      (default: off, available input size: ~2525184)\n");
+    fprintf(stderr, "  -i : input binary path (default: data/inputTensor.bin\n");
+    fprintf(stderr, "  -o : output binary path (default: output.bin\n");
+    fprintf(stderr, "  -p : parameter binary path (default: data/weights.bin\n");
+    fprintf(stderr, "  -a : anwer binary path (default: data/outputTensor.bin\n");
+    fprintf(stderr, "  -v : enable validate. compare with answer binary (default: off)\n");
     fprintf(stderr, "  -s : save generated sentences (default: off)\n");
     fprintf(stderr, "  -w : enable warmup (default: off)\n");
     fprintf(stderr, "  -h : print this page.\n");

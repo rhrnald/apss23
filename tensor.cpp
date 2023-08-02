@@ -5,7 +5,6 @@
 using namespace std;
 
 
-
 Tensor::Tensor(const vector<int> &shape_) {
   reshape(shape_);
   buf = (float*)malloc(n*sizeof(float));
@@ -15,16 +14,19 @@ Tensor::Tensor(const int d1, const int d2, const int d3, const int d4) : Tensor(
 
 
 Tensor::Tensor(const char* filename) {
-  size_t m;
-  buf=(float*)read_binary(filename, &m);
-  n=m;
-  reshape({n});
+  load(filename);
 }
 
 Tensor::~Tensor(){
   free(buf);
 }
 
+void Tensor::load(const char* filename) {
+  size_t m;
+  buf=(float*)read_binary(filename, &m);
+  n=m;
+  reshape({n});
+}
 void Tensor::save(const char* filename) {
   write_binary(buf,filename,n);
 }

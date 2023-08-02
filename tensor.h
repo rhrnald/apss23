@@ -14,6 +14,7 @@ struct Tensor {
 
   ~Tensor();
   
+  void load(const char* filename); 
   void save(const char* filename); 
   int get_elem();
   void reshape(const vector<int> &shape_);
