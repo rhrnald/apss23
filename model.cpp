@@ -2,7 +2,6 @@
 
 #include "model.h"
 #include "util.h"
-extern int mpi_rank, mpi_size;  // defined in main.cpp 
 extern int N;
 
 // class BrainTumorModel(nn.Module):
@@ -109,23 +108,21 @@ static void linear(float *in, float *out, float *weight, float *bias, int N, int
 static void relu(float *inout, int N);
 
 void model_forward(Tensor *input, Tensor *output){
-  if(mpi_rank==0) {
-    conv2d(input->buf, c1->buf, conv0_weight, conv0_bias, N, 1, 128, 256, 256, 3);
-    instancenorm2d(c1->buf, i1->buf, instanceNorm2d0_weight, instanceNorm2d0_bias, N, 128, 254, 254);
-    maxpool2d(i1->buf, m1->buf, N*128, 254, 254, 2, 2);
-    relu(m1->buf, N*128*127*127);
+  conv2d(input->buf, c1->buf, conv0_weight, conv0_bias, N, 1, 128, 256, 256, 3);
+  instancenorm2d(c1->buf, i1->buf, instanceNorm2d0_weight, instanceNorm2d0_bias, N, 128, 254, 254);
+  maxpool2d(i1->buf, m1->buf, N*128, 254, 254, 2, 2);
+  relu(m1->buf, N*128*127*127);
 
-    conv2d(m1->buf, c2->buf, conv1_weight, conv1_bias, N, 128, 256, 127, 127, 3);
-    instancenorm2d(c2->buf, i2->buf, instanceNorm2d1_weight, instanceNorm2d1_bias, N, 256, 125, 125);
-    maxpool2d(i2->buf, m2->buf, N*256, 125, 125, 2, 2);
-    relu(m2->buf, N*256*62*62);
+  conv2d(m1->buf, c2->buf, conv1_weight, conv1_bias, N, 128, 256, 127, 127, 3);
+  instancenorm2d(c2->buf, i2->buf, instanceNorm2d1_weight, instanceNorm2d1_bias, N, 256, 125, 125);
+  maxpool2d(i2->buf, m2->buf, N*256, 125, 125, 2, 2);
+  relu(m2->buf, N*256*62*62);
 
-    linear(m2->buf, l1->buf, linear1_weight, linear1_bias, N*256*62, 62, 128);
-    relu(l1->buf, N*256*62*128);
-    linear(l1->buf, l2->buf, linear2_weight, linear2_bias, N*256*62, 128, 64);
-    l2->reshape({N, 1015808});
-    linear(l2->buf, output->buf, linear3_weight, linear3_bias, N, 1015808, 2);
-  }
+  linear(m2->buf, l1->buf, linear1_weight, linear1_bias, N*256*62, 62, 128);
+  relu(l1->buf, N*256*62*128);
+  linear(l1->buf, l2->buf, linear2_weight, linear2_bias, N*256*62, 128, 64);
+  l2->reshape({N, 1015808});
+  linear(l2->buf, output->buf, linear3_weight, linear3_bias, N, 1015808, 2);
 }
 
 

@@ -8,7 +8,6 @@
 
 using namespace std;
 
-extern int mpi_rank, mpi_size;  // defined in main.cpp
 extern int N;                   // defined in main.cpp
 extern bool V,S,W;                  // defined in main.cpp
 extern char* input_fname, *output_fname, *answer_fname, *parameter_fname;
@@ -31,14 +30,12 @@ void parse_option(int argc, char **argv){
     }
   }
 
-  if (mpi_rank == 0) {
-    fprintf(stderr, "\n Model : ???\n");
-    fprintf(stderr, " =============================================\n");
-    fprintf(stderr, " Warming up : %s\n", W? "ON":"OFF");
-    fprintf(stderr, " Validation : %s\n", V? "ON":"OFF");
-    fprintf(stderr, " Save output tensor : %s\n", S? "ON":"OFF");
-    fprintf(stderr, " ---------------------------------------------\n");
-  }
+  fprintf(stderr, "\n Model : ???\n");
+  fprintf(stderr, " =============================================\n");
+  fprintf(stderr, " Warming up : %s\n", W? "ON":"OFF");
+  fprintf(stderr, " Validation : %s\n", V? "ON":"OFF");
+  fprintf(stderr, " Save output tensor : %s\n", S? "ON":"OFF");
+  fprintf(stderr, " ---------------------------------------------\n");
 }
 
 void *read_binary(const char *filename, size_t *size) {
@@ -85,16 +82,14 @@ double get_time() {
 
 
 void print_help() {
-  if (mpi_rank == 0) {
     fprintf(stderr, " Usage: ./translator [-n num_input_sentences] [-vpwh]\n");
     fprintf(stderr, " Options:\n");
-    fprintf(stderr, "  -i : input binary path (default: data/inputTensor.bin\n");
+    fprintf(stderr, "  -i : input binary path (default: data/sample_input.bin\n");
     fprintf(stderr, "  -o : output binary path (default: output.bin\n");
     fprintf(stderr, "  -p : parameter binary path (default: data/weights.bin\n");
-    fprintf(stderr, "  -a : anwer binary path (default: data/outputTensor.bin\n");
+    fprintf(stderr, "  -a : anwer binary path (default: data/sample_answer.bin\n");
     fprintf(stderr, "  -v : enable validate. compare with answer binary (default: off)\n");
     fprintf(stderr, "  -s : save generated sentences (default: off)\n");
     fprintf(stderr, "  -w : enable warmup (default: off)\n");
     fprintf(stderr, "  -h : print this page.\n");
-  }
 }

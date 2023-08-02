@@ -2,7 +2,6 @@
 
 #include "model.h"
 #include "util.h"
-extern int mpi_rank, mpi_size;  // defined in main.cpp 
 extern int N;
 
 // class BrainTumorModel(nn.Module):
@@ -47,7 +46,6 @@ static float *conv0_weight, *conv0_bias, *conv1_weight, *conv1_bias,
 
 static Tensor *c1, *i1, *m1, *c2, *i2, *m2, *l1, *l2;
 void initialize_model_seq(const char* parameter_fname){
-  if(mpi_rank==0) {
   size_t m; //2345922
   float *buf=(float*)read_binary(parameter_fname, &m);
   conv0_weight         = buf; buf+=1152;//1152
@@ -73,9 +71,7 @@ void initialize_model_seq(const char* parameter_fname){
   m2 = new Tensor(N, 256, 62, 62);
   l1 = new Tensor(N, 256, 62, 128);
   l2 = new Tensor(N, 256, 62, 64);
-  }
 }
-// Conv2D
 // https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
 // Size of in  = N * C_IN * H_IN * W_IN
 // Size of out = N * C_OUT * (H_IN-K+1) * (W_IN-K+1)
@@ -111,25 +107,22 @@ static void linear(float *in, float *out, float *weight, float *bias, int N, int
 static void relu(float *inout, int N);
 
 void model_forward_seq(Tensor *input, Tensor *output){
-  if(mpi_rank==0) {
-    conv2d(input->buf, c1->buf, conv0_weight, conv0_bias, N, 1, 128, 256, 256, 3);
-    instancenorm2d(c1->buf, i1->buf, instanceNorm2d0_weight, instanceNorm2d0_bias, N, 128, 254, 254);
-    maxpool2d(i1->buf, m1->buf, N*128, 254, 254, 2, 2);
-    relu(m1->buf, N*128*127*127);
+  conv2d(input->buf, c1->buf, conv0_weight, conv0_bias, N, 1, 128, 256, 256, 3);
+  instancenorm2d(c1->buf, i1->buf, instanceNorm2d0_weight, instanceNorm2d0_bias, N, 128, 254, 254);
+  maxpool2d(i1->buf, m1->buf, N*128, 254, 254, 2, 2);
+  relu(m1->buf, N*128*127*127);
 
-    conv2d(m1->buf, c2->buf, conv1_weight, conv1_bias, N, 128, 256, 127, 127, 3);
-    instancenorm2d(c2->buf, i2->buf, instanceNorm2d1_weight, instanceNorm2d1_bias, N, 256, 125, 125);
-    maxpool2d(i2->buf, m2->buf, N*256, 125, 125, 2, 2);
-    relu(m2->buf, N*256*62*62);
+  conv2d(m1->buf, c2->buf, conv1_weight, conv1_bias, N, 128, 256, 127, 127, 3);
+  instancenorm2d(c2->buf, i2->buf, instanceNorm2d1_weight, instanceNorm2d1_bias, N, 256, 125, 125);
+  maxpool2d(i2->buf, m2->buf, N*256, 125, 125, 2, 2);
+  relu(m2->buf, N*256*62*62);
   
   
-    linear(m2->buf, l1->buf, linear1_weight, linear1_bias, N*256*62, 62, 128);
-    relu(l1->buf, N*256*62*128);
-    linear(l1->buf, l2->buf, linear2_weight, linear2_bias, N*256*62, 128, 64);
-    l2->reshape({N, 1015808});
-    linear(l2->buf, output->buf, linear3_weight, linear3_bias, N, 1015808, 2);
-
-  }
+  linear(m2->buf, l1->buf, linear1_weight, linear1_bias, N*256*62, 62, 128);
+  relu(l1->buf, N*256*62*128);
+  linear(l1->buf, l2->buf, linear2_weight, linear2_bias, N*256*62, 128, 64);
+  l2->reshape({N, 1015808});
+  linear(l2->buf, output->buf, linear3_weight, linear3_bias, N, 1015808, 2);
 }
 
 
@@ -222,7 +215,6 @@ static void relu(float *inout, int N) {
 }
 
 void finalize_model_seq() {
-  if(mpi_rank==0) {
   delete(c1);
   delete(i1);
   delete(m1);
@@ -231,5 +223,4 @@ void finalize_model_seq() {
   delete(m2);
   delete(l1);
   delete(l2);
-  }
 }
