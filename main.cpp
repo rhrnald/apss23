@@ -12,15 +12,10 @@ int S, W, V;
 
 char parameter_fname[30] = "./data/weights.bin";
 char input_fname[30] = "./data/sample_input.bin";
-char answer_fname[30] =
-    "./data/sample_answer.bin";         // TODO write your student id
-char output_fname[30] = "./output.bin"; // TODO write your student id
+char answer_fname[30] = "./data/sample_answer.bin";
+char output_fname[30] = "./output.bin";
 
 int main(int argc, char **argv) {
-  // MPI_Init(&argc, &argv);
-  // MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
-  // MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
-
   parse_option(argc, argv);
   Tensor *input, *output;
 
@@ -64,16 +59,13 @@ int main(int argc, char **argv) {
 
   st = get_time();
 
-  // MPI_Barrier(MPI_COMM_WORLD);
   model_forward(input, output);
-  // MPI_Barrier(MPI_COMM_WORLD);
 
   et = get_time();
   fprintf(stderr, "  DONE!\n");
   fprintf(stderr, " ---------------------------------------------\n");
   fprintf(stderr, " Elapsed time : %lf s\n", et - st);
-  fprintf(stderr, " Throughput   : %lf GFLOPS\n",
-          1 * (double)N / (et - st)); // 계산필요!
+  fprintf(stderr, " Throughput   : %lf img/sec\n",(double)N / (et - st));
 
   if (S) {
     fprintf(stderr, " Saving output...\n");
@@ -85,7 +77,6 @@ int main(int argc, char **argv) {
   ////////////////////////////////////////////////////////////////////
 
   finalize_model();
-  // MPI_Finalize();
 
   if (V) {
     Tensor answer = Tensor(answer_fname);

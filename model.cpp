@@ -225,9 +225,8 @@ static void maxpool2d(float *in, float *out, int N, int H_IN, int W_IN, int kH,
   for (int n = 0; n < N; n++) {
     for (int h_out = 0; h_out < H_OUT; h_out++) {
       for (int w_out = 0; w_out < W_OUT; w_out++) {
-        out[n * H_OUT * W_OUT + h_out * W_OUT + w_out] = 0; // 어쩌피 ReLU
-        // out[n*H_OUT*W_OUT + h_out*W_OUT + w_out] = in[n*H_IN*W_IN +
-        // (h_out*kH)*H_IN + (w_out*kW)];
+        out[n*H_OUT*W_OUT + h_out*W_OUT + w_out] = in[n*H_IN*W_IN +
+         (h_out*kH)*H_IN + (w_out*kW)];
         for (int kh = 0; kh < kH; kh++)
           for (int kw = 0; kw < kW; kw++)
             out[n * H_OUT * W_OUT + h_out * W_OUT + w_out] =
