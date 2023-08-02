@@ -1,40 +1,60 @@
 #include "util.h"
 
-#include <vector>
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
 #include <map>
 #include <unistd.h>
+#include <vector>
 
 using namespace std;
 
-extern int N;                   // defined in main.cpp
-extern bool V,S,W;                  // defined in main.cpp
-extern char* input_fname, *output_fname, *answer_fname, *parameter_fname;
+extern int N;        // defined in main.cpp
+extern bool V, S, W; // defined in main.cpp
+extern char *input_fname, *output_fname, *answer_fname, *parameter_fname;
 
-void parse_option(int argc, char **argv){
+void parse_option(int argc, char **argv) {
 
   int opt;
-  while((opt = getopt(argc, argv, "i:o:vv:swh")) != -1) {
+  while ((opt = getopt(argc, argv, "i:o:vv:swh")) != -1) {
     switch (opt) {
-      case 'i': strcpy(input_fname, optarg); break;
-      case 'o': strcpy(output_fname, optarg); break;
-      case 'a': strcpy(answer_fname, optarg); break;
-      case 'p': strcpy(parameter_fname, optarg); break;
+    case 'i':
+      strcpy(input_fname, optarg);
+      break;
+    case 'o':
+      strcpy(output_fname, optarg);
+      break;
+    case 'a':
+      strcpy(answer_fname, optarg);
+      break;
+    case 'p':
+      strcpy(parameter_fname, optarg);
+      break;
 
-      case 'v': V = true; break;
-      case 's': S = true; break;
-      case 'w': W = true; break;
-      case 'h': print_help(); exit(-1); break;
-      default: print_help(); exit(-1); break;
+    case 'v':
+      V = true;
+      break;
+    case 's':
+      S = true;
+      break;
+    case 'w':
+      W = true;
+      break;
+    case 'h':
+      print_help();
+      exit(-1);
+      break;
+    default:
+      print_help();
+      exit(-1);
+      break;
     }
   }
 
   fprintf(stderr, "\n Model : ???\n");
   fprintf(stderr, " =============================================\n");
-  fprintf(stderr, " Warming up : %s\n", W? "ON":"OFF");
-  fprintf(stderr, " Validation : %s\n", V? "ON":"OFF");
-  fprintf(stderr, " Save output tensor : %s\n", S? "ON":"OFF");
+  fprintf(stderr, " Warming up : %s\n", W ? "ON" : "OFF");
+  fprintf(stderr, " Validation : %s\n", V ? "ON" : "OFF");
+  fprintf(stderr, " Save output tensor : %s\n", S ? "ON" : "OFF");
   fprintf(stderr, " ---------------------------------------------\n");
 }
 
@@ -57,18 +77,19 @@ void *read_binary(const char *filename, size_t *size) {
   }
   fclose(f);
 
-  if (size != NULL) *size = (size_t)(size_ / 4);  // float
+  if (size != NULL)
+    *size = (size_t)(size_ / 4); // float
   return buf;
 }
 
 void write_binary(float *output, const char *filename, int size_) {
   fprintf(stderr, " Writing output ... ");
   FILE *output_fp = (FILE *)fopen(filename, "w");
-  
-  char *tmp = (char*)output;
-  for (int i = 0; i < 4*size_; i++) {
+
+  char *tmp = (char *)output;
+  for (int i = 0; i < 4 * size_; i++) {
     fprintf(output_fp, "%c", tmp[i]);
-  }   
+  }
   fclose(output_fp);
   fprintf(stderr, "DONE!\n");
 }
@@ -77,19 +98,21 @@ double get_time() {
   struct timespec tv;
   clock_gettime(CLOCK_MONOTONIC, &tv);
 
-  return tv.tv_sec+tv.tv_nsec*1e-9;
+  return tv.tv_sec + tv.tv_nsec * 1e-9;
 }
 
-
 void print_help() {
-    fprintf(stderr, " Usage: ./translator [-n num_input_sentences] [-vpwh]\n");
-    fprintf(stderr, " Options:\n");
-    fprintf(stderr, "  -i : input binary path (default: data/sample_input.bin\n");
-    fprintf(stderr, "  -o : output binary path (default: output.bin\n");
-    fprintf(stderr, "  -p : parameter binary path (default: data/weights.bin\n");
-    fprintf(stderr, "  -a : anwer binary path (default: data/sample_answer.bin\n");
-    fprintf(stderr, "  -v : enable validate. compare with answer binary (default: off)\n");
-    fprintf(stderr, "  -s : save generated sentences (default: off)\n");
-    fprintf(stderr, "  -w : enable warmup (default: off)\n");
-    fprintf(stderr, "  -h : print this page.\n");
+  fprintf(stderr, " Usage: ./translator [-n num_input_sentences] [-vpwh]\n");
+  fprintf(stderr, " Options:\n");
+  fprintf(stderr, "  -i : input binary path (default: data/sample_input.bin\n");
+  fprintf(stderr, "  -o : output binary path (default: output.bin\n");
+  fprintf(stderr, "  -p : parameter binary path (default: data/weights.bin\n");
+  fprintf(stderr,
+          "  -a : anwer binary path (default: data/sample_answer.bin\n");
+  fprintf(
+      stderr,
+      "  -v : enable validate. compare with answer binary (default: off)\n");
+  fprintf(stderr, "  -s : save generated sentences (default: off)\n");
+  fprintf(stderr, "  -w : enable warmup (default: off)\n");
+  fprintf(stderr, "  -h : print this page.\n");
 }
