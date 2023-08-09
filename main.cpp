@@ -11,8 +11,8 @@ int N;
 int S, W, V;
 
 char parameter_fname[30] = "./data/weights.bin";
-char input_fname[30] = "./data/sample_input.bin";
-char answer_fname[30] = "./data/sample_answer.bin";
+char input_fname[50] = "./data/bins/input8N.bin";
+char answer_fname[50] = "./data/bins/output8N.bin";
 char output_fname[30] = "./output.bin";
 
 int main(int argc, char **argv) {
