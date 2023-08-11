@@ -102,13 +102,14 @@ double get_time() {
 }
 
 void print_help() {
-  fprintf(stderr, " Usage: ./translator [-n num_input_sentences] [-vpwh]\n");
-  fprintf(stderr, " Options:\n");
-  fprintf(stderr, "  -i : input binary path (default: data/sample_input.bin\n");
-  fprintf(stderr, "  -o : output binary path (default: output.bin\n");
-  fprintf(stderr, "  -p : parameter binary path (default: data/weights.bin\n");
   fprintf(stderr,
-          "  -a : anwer binary path (default: data/sample_answer.bin\n");
+          " Usage: ./model [-i pth] [-o pth] [-p pth] [-a pth] [-vswh]\n");
+  fprintf(stderr, " Options:\n");
+  fprintf(stderr, "  -i : input binary path (default: data/bin/input8N.bin)\n");
+  fprintf(stderr, "  -o : output binary path (default: output.bin)\n");
+  fprintf(stderr, "  -p : parameter binary path (default: data/weights.bin)\n");
+  fprintf(stderr,
+          "  -a : anwer binary path (default: data/bin/output8N.bin)\n");
   fprintf(
       stderr,
       "  -v : enable validate. compare with answer binary (default: off)\n");

@@ -9,7 +9,7 @@ struct Tensor {
   int shape[4];
   float *buf = nullptr;
   Tensor(const vector<int> &shape_);
-  Tensor(float * data, const vector<int> &shape_);
+  Tensor(float *data, const vector<int> &shape_);
 
   ~Tensor();
 
