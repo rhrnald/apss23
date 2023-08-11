@@ -25,9 +25,9 @@ int main(int argc, char **argv) {
 
   // Get input from binary file
   size_t sz;
-  
-    fprintf(stderr, " Reading input from: %s\n", input_fname);
-  input = (float*)read_binary(input_fname, &sz);
+
+  fprintf(stderr, " Reading input from: %s\n", input_fname);
+  input = (float *)read_binary(input_fname, &sz);
   if (sz % (1 << 16) != 0) {
     fprintf(stderr, " Wrong input tensor shape: %ld\n", sz);
   }
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   N = sz >> 16;
 
   // Define output Tensor
-  output = (float*)malloc(sizeof(float)*N*2);
+  output = (float *)malloc(sizeof(float) * N * 2);
 
   // Initalize model
   initialize_model(parameter_fname);
@@ -66,11 +66,11 @@ int main(int argc, char **argv) {
   fprintf(stderr, "  DONE!\n");
   fprintf(stderr, " ---------------------------------------------\n");
   fprintf(stderr, " Elapsed time : %lf s\n", et - st);
-  fprintf(stderr, " Throughput   : %lf img/sec\n",(double)N / (et - st));
+  fprintf(stderr, " Throughput   : %lf img/sec\n", (double)N / (et - st));
 
   if (S) {
     fprintf(stderr, " Saving output to: %s\n", output_fname);
-    write_binary(output, output_fname, N*2);
+    write_binary(output, output_fname, N * 2);
   }
 
   ////////////////////////////////////////////////////////////////////
@@ -81,11 +81,11 @@ int main(int argc, char **argv) {
 
   if (V) {
     size_t sz_ans;
-    float *answer = (float*)read_binary(answer_fname, &sz_ans);
+    float *answer = (float *)read_binary(answer_fname, &sz_ans);
 
     int diff = -1;
     for (int i = 0; i < N * 2; i++) {
-      if (abs(*(output+i) - *(answer+i)) > 1e-3) {
+      if (abs(*(output + i) - *(answer + i)) > 1e-3) {
         diff = i;
         break;
       }
@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
       fprintf(stderr,
               " Validation fail: First mistmatch on index %d(output[i]=%f , "
               "answer[i]=%f)\n",
-              diff, *(output+diff), *(answer+diff));
+              diff, *(output + diff), *(answer + diff));
   }
 
   return EXIT_SUCCESS;

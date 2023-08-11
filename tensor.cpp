@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <cstring>
+#include <stdlib.h>
 
 #include "tensor.h"
 #include "util.h"
@@ -13,7 +13,7 @@ Tensor::Tensor(const vector<int> &shape_) {
 Tensor::Tensor(float *data, const vector<int> &shape_) {
   reshape(shape_);
   buf = (float *)malloc(n * sizeof(float));
-  memcpy(buf, data, get_elem()*sizeof(float));
+  memcpy(buf, data, get_elem() * sizeof(float));
 }
 
 Tensor::~Tensor() { free(buf); }
