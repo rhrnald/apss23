@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "model.h"
-#include "tensor.h"
 #include "util.h"
 
 int N;
@@ -17,7 +16,7 @@ char output_fname[30] = "./output.bin";
 
 int main(int argc, char **argv) {
   parse_option(argc, argv);
-  Tensor *input, *output;
+  float *input, *output;
 
   ////////////////////////////////////////////////////////////////////
   // INITIALIZATION                                                 //
@@ -25,16 +24,18 @@ int main(int argc, char **argv) {
   ////////////////////////////////////////////////////////////////////
 
   // Get input from binary file
-  input = new Tensor(input_fname);
-  if (input->get_elem() % (1 << 16) != 0) {
-    fprintf(stderr, " Wrong input tensor shape: %d\n", input->get_elem());
+  size_t sz;
+  
+    fprintf(stderr, " Reading input from: %s\n", input_fname);
+  input = (float*)read_binary(input_fname, &sz);
+  if (sz % (1 << 16) != 0) {
+    fprintf(stderr, " Wrong input tensor shape: %ld\n", sz);
   }
 
-  N = input->get_elem() >> 16;
-  input->reshape({N, 1, 256, 256});
+  N = sz >> 16;
 
   // Define output Tensor
-  output = new Tensor({N, 2});
+  output = (float*)malloc(sizeof(float)*N*2);
 
   // Initalize model
   initialize_model(parameter_fname);
@@ -68,8 +69,8 @@ int main(int argc, char **argv) {
   fprintf(stderr, " Throughput   : %lf img/sec\n",(double)N / (et - st));
 
   if (S) {
-    fprintf(stderr, " Saving output...\n");
-    output->save(output_fname);
+    fprintf(stderr, " Saving output to: %s\n", output_fname);
+    write_binary(output, output_fname, N*2);
   }
 
   ////////////////////////////////////////////////////////////////////
@@ -79,11 +80,12 @@ int main(int argc, char **argv) {
   finalize_model();
 
   if (V) {
-    Tensor answer = Tensor(answer_fname);
+    size_t sz_ans;
+    float *answer = (float*)read_binary(answer_fname, &sz_ans);
 
     int diff = -1;
     for (int i = 0; i < N * 2; i++) {
-      if (abs(output->buf[i] - answer.buf[i]) > 1e-3) {
+      if (abs(*(output+i) - *(answer+i)) > 1e-3) {
         diff = i;
         break;
       }
@@ -94,7 +96,7 @@ int main(int argc, char **argv) {
       fprintf(stderr,
               " Validation fail: First mistmatch on index %d(output[i]=%f , "
               "answer[i]=%f)\n",
-              diff, output->buf[diff], answer.buf[diff]);
+              diff, *(output+diff), *(answer+diff));
   }
 
   return EXIT_SUCCESS;

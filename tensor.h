@@ -8,9 +8,8 @@ struct Tensor {
   int ndim = 0;
   int shape[4];
   float *buf = nullptr;
-  Tensor(const int d1, const int d2, const int d3, const int d4);
   Tensor(const vector<int> &shape_);
-  Tensor(const char *filename);
+  Tensor(float * data, const vector<int> &shape_);
 
   ~Tensor();
 

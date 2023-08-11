@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <cstring>
 
 #include "tensor.h"
 #include "util.h"
@@ -9,10 +10,11 @@ Tensor::Tensor(const vector<int> &shape_) {
   buf = (float *)malloc(n * sizeof(float));
 }
 
-Tensor::Tensor(const int d1, const int d2, const int d3, const int d4)
-    : Tensor(vector<int>({d1, d2, d3, d4})) {}
-
-Tensor::Tensor(const char *filename) { load(filename); }
+Tensor::Tensor(float *data, const vector<int> &shape_) {
+  reshape(shape_);
+  buf = (float *)malloc(n * sizeof(float));
+  memcpy(buf, data, get_elem()*sizeof(float));
+}
 
 Tensor::~Tensor() { free(buf); }
 
